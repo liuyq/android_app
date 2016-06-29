@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="horizontal"-->
+
+    <!--android:paddingBottom="@dimen/activity_vertical_margin"-->
+    <!--android:paddingLeft="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingTop="@dimen/activity_vertical_margin"-->
+    <!--tools:context="com.liu.dua.dua.MainActivity">-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.liu.dua.dua.MainActivity">
+
+
+    <TextView
+        android:id="@+id/show_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:text="Hello World!"
+        android:textSize="60dp"
+        android:textColor="#08f518" />
+
+    <Button
+        android:id="@+id/next_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number"
+        android:onClick="number"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/random_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Random"
+        android:onClick="randomNumber"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/math_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MathIn100"
+        android:onClick="mathIn100"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/addition20_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AddititonIn20"
+        android:onClick="additionIn20"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

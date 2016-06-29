@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.liu.dua.dua.Main2Activity">
+
+    <TextView
+        android:id="@+id/show_message_mathin20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:text="Hello World, MathIn20"
+        android:textSize="60dp"
+        android:textColor="#08f518" />
+
+    <Button
+        android:id="@+id/addition20_botton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AddititonIn20"
+        android:onClick="additionIn20"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>
