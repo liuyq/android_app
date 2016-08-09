@@ -1,5 +1,10 @@
 package com.liu.dua.dua;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,10 +21,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Main2Activity extends AppCompatActivity {
@@ -110,7 +121,6 @@ public class Main2Activity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            Log.e("LIUYQ", "======SectionsPagerAdapter ====getItem===============tabIndex====== " + position);
 //            return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
                 case 0:
@@ -121,6 +131,8 @@ public class Main2Activity extends AppCompatActivity {
                     return new MathIn20Fragment();
                 case 3:
                     return new MathIn100Fragment();
+                case 4:
+                    return new PackageListFragment();
             }
 
             return null;
@@ -129,7 +141,7 @@ public class Main2Activity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return 5;
         }
 
         @Override
@@ -143,6 +155,8 @@ public class Main2Activity extends AppCompatActivity {
                     return "MathIn20";
                 case 3:
                     return "MathI100";
+                case 4:
+                    return "PackageList";
             }
             return null;
         }
@@ -165,7 +179,6 @@ public class Main2Activity extends AppCompatActivity {
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
-            Log.e("LIUYQ", "==========PlaceholderFragment newInstanc===============tabIndex====== " + sectionNumber);
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
@@ -178,7 +191,6 @@ public class Main2Activity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             int tabIndex = getArguments().getInt(ARG_SECTION_NUMBER);
-            Log.e("LIUYQ", "========PlaceholderFragment onCreateView=================tabIndex====== " + tabIndex);
             View rootView = null;
             switch (tabIndex) {
                 case 1:
@@ -225,7 +237,7 @@ public class Main2Activity extends AppCompatActivity {
             inputNumberEditText.setText("");
 
             TextView statisicTextView = (TextView) rootView.findViewById(R.id.random_number_statistic);
-            statisicTextView.setText(String.format("Total: %d, Pass:%d Fail:%d",randomNumberTotal++, randomNumberPass++, randomNumberFail));
+            statisicTextView.setText(String.format("Total: %d, Pass:%d Fail:%d",randomNumberTotal, randomNumberPass, randomNumberFail));
 
             return rootView;
         }
@@ -249,6 +261,108 @@ public class Main2Activity extends AppCompatActivity {
         }
     }
 
+    static class LocalPackageInfo {
+        private String appName;
+        private String packageName;
+        private String versionName;
+        private int versionCode;
+        private Drawable icon;
+        private boolean isSystemPackage;
+        private boolean isEnabled;
+
+        public LocalPackageInfo(PackageInfo pack, PackageManager pm){
+            this.appName = pack.applicationInfo.loadLabel(pm).toString();
+            this.packageName = pack.packageName;
+            this.versionName = pack.versionName;
+            this.versionCode = pack.versionCode;
+            this.isSystemPackage = (pack.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            this.icon = pack.applicationInfo.loadIcon(pm);
+            this.isEnabled = pack.applicationInfo.enabled;
+        }
+        public String toString(){
+            return this.appName + ":" + this.packageName + ":" + this.isSystemPackage;
+        }
+    }
+
+    static class PackageListAdapter extends ArrayAdapter<LocalPackageInfo> {
+        private final Context context;
+        private final ArrayList values;
+
+        public PackageListAdapter(Context context, ArrayList values) {
+            super(context, R.layout.fragment_package_list_row, values);
+            this.context = context;
+            this.values = values;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.fragment_package_list_row, parent, false);
+            TextView appNameTextView = (TextView) rowView.findViewById(R.id.appName);
+            TextView packageNameTextView = (TextView) rowView.findViewById(R.id.packageName);
+            TextView isSystemTextView = (TextView) rowView.findViewById(R.id.isSystemPackage);
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
+
+            Button enableDisableBtn = (Button) rowView.findViewById(R.id.enabled_disable_btn);
+
+                    final LocalPackageInfo packInfo = (LocalPackageInfo)values.get(position);
+
+            appNameTextView.setText(packInfo.appName);
+            packageNameTextView.setText(packInfo.packageName);
+            isSystemTextView.setText(""+packInfo.isSystemPackage);
+            imageView.setImageDrawable(packInfo.icon);
+
+            if(packInfo.isEnabled){
+                enableDisableBtn.setText("Disable");
+//                enableDisableBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        getContext().getPackageManager().setApplicationEnabledSetting(packInfo.packageName,
+//                                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,0);
+//                    }
+//                });
+            }else{
+                enableDisableBtn.setText("Enable");
+//                enableDisableBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        getContext().getPackageManager().setApplicationEnabledSetting(packInfo.packageName,
+//                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,0);
+//                    }
+//                });
+            }
+            enableDisableBtn.setEnabled(false);
+            return rowView;
+        }
+    }
+
+    // http://www.vogella.com/tutorials/AndroidListView/article.html
+    // https://developer.android.com/guide/topics/ui/layout/listview.html#Example
+    public static class PackageListFragment extends Fragment {
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_package_list, container, false);
+            ListView listView = (ListView) rootView.findViewById(R.id.listView);
+
+            ArrayList<LocalPackageInfo> packages = new ArrayList<LocalPackageInfo>();
+
+            PackageManager pm = this.getContext().getPackageManager();
+            // TODO: why 0 here?
+            List<PackageInfo> packs = pm.getInstalledPackages(0);
+
+            for(PackageInfo pack:packs){
+                packages.add(new LocalPackageInfo(pack, pm));
+            }
+            PackageListAdapter adapter = new PackageListAdapter(this.getContext(), packages);
+
+            listView.setAdapter(adapter);
+
+            return rootView;
+        }
+    }
 
     public void number(View view) {
         TextView textView = (TextView) findViewById(R.id.show_message_number);
@@ -277,9 +391,8 @@ public class Main2Activity extends AppCompatActivity {
 
         if((inputNumber - randomNumber) != 1){
             Toast.makeText(view.getContext(), "Wrong!", Toast.LENGTH_SHORT).show();
-            randomNumberFail++;
             TextView statisicTextView = (TextView) findViewById(R.id.random_number_statistic);
-            statisicTextView.setText(String.format("Total: %d, Pass:%d Fail:%d",randomNumberTotal++, randomNumberPass++, randomNumberFail));
+            statisicTextView.setText(String.format("Total: %d, Pass:%d, Fail:%d", ++randomNumberTotal, randomNumberPass, ++randomNumberFail));
             return;
         }
         Toast.makeText(view.getContext(), "Great, let's play again!", Toast.LENGTH_SHORT).show();
@@ -288,7 +401,7 @@ public class Main2Activity extends AppCompatActivity {
         textView.setOnLongClickListener(null);
 
         TextView statisicTextView = (TextView) findViewById(R.id.random_number_statistic);
-        statisicTextView.setText(String.format("Total: %d, Pass:%d Fail:%d",randomNumberTotal++, randomNumberPass++, randomNumberFail));
+        statisicTextView.setText(String.format("Total: %d, Pass:%d Fail:%d",++randomNumberTotal, ++randomNumberPass, randomNumberFail));
     }
 
     public void mathIn100(View view) {
@@ -354,4 +467,6 @@ public class Main2Activity extends AppCompatActivity {
             Log.e("LIUYQ", "Show message component not found");
         }
     }
+
+
 }

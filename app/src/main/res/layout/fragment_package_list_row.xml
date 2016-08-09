@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.1">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="fill_parent"
+            android:layout_height="22px"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+            >
+        </ImageView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.2">
+
+        <TextView
+            android:id="@+id/appName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+
+            >
+        </TextView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.5">
+
+        <TextView
+            android:id="@+id/packageName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+            >
+        </TextView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.2">
+        <TextView
+            android:id="@+id/isSystemPackage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+            >
+        </TextView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.2">
+        <Button
+            android:id="@+id/enabled_disable_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Disable"
+            android:layout_marginLeft="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="4px"
+            >
+        </Button>
+
+    </RelativeLayout>
+
+</LinearLayout>
