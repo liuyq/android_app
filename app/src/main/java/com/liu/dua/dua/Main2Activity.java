@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -198,7 +199,7 @@ public class Main2Activity extends AppCompatActivity {
                 case 2:
                     rootView = inflater.inflate(R.layout.fragment_random_number, container, false);
                 case 3:
-                    rootView = inflater.inflate(R.layout.fragment_mathin20, container, false);
+                    rootView = inflater.inflate(R.layout.fragment_list_row_mathin20, container, false);
                 case 4:
                     rootView = inflater.inflate(R.layout.fragment_mathin100, container, false);
             }
@@ -251,13 +252,164 @@ public class Main2Activity extends AppCompatActivity {
             return rootView;
         }
     }
+
+
+    static class MathTest{
+        private String inputResult = "";
+        private int expectResult;
+        private int operand1;
+        private String operator;
+        private int operand2;
+
+
+        public MathTest(int operand1, String operator, int operand2, int expectResult){
+            this.expectResult = expectResult;
+            this.operand1 = operand1;
+            this.operator = operator;
+            this.operand2 = operand2;
+
+        }
+
+        public void setInputResult(String input){
+            this.inputResult = input;
+        }
+
+        public String toString(){
+            return String.format("%d %s %d = %d, inputResult=%s", operand1, operator, operand2, expectResult, inputResult);
+        }
+
+        public static ArrayList<MathTest> generateTests(int testNumber, int scope){
+            ArrayList<MathTest> tests = new ArrayList<MathTest>();
+
+            for(int i=0; i < testNumber; i++) {
+                boolean isAddition = r.nextBoolean();
+                int operand1 = r.nextInt(scope);
+                String output = "";
+                int result = 0;
+                int operand2;
+                if (isAddition) {
+                    operand2 = r.nextInt(scope - operand1);
+                    result = operand1 + operand2;
+                } else {
+                    operand2 = operand1 == 0 ? 0 : r.nextInt(operand1);
+                    result = operand1 - operand2;
+                }
+
+                tests.add(new MathTest(operand1, isAddition ? "+" : "-", operand2,  result));
+            }
+
+
+            return tests;
+        }
+    }
+
+    static class MathTestListAdapter extends ArrayAdapter<MathTest> {
+        private final Context context;
+        private final ArrayList values;
+        private boolean checkResultShow = false;
+
+        public void setCheckResultShow(boolean checkResultShow) {
+            this.checkResultShow = checkResultShow;
+        }
+
+        public MathTestListAdapter(Context context, ArrayList values) {
+            super(context, R.layout.fragment_list_row_mathin20, values);
+            this.context = context;
+            this.values = values;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.fragment_list_row_mathin20, parent, false);
+
+            TextView operand1TextView = (TextView) rowView.findViewById(R.id.mathin20_operand1);
+            TextView operand2TextView = (TextView) rowView.findViewById(R.id.mathin20_operand2);
+            TextView operatorTextView = (TextView) rowView.findViewById(R.id.mathin20_operator);
+            EditText inputEditText = (EditText) rowView.findViewById(R.id.mathin20_input_result);
+            TextView checkResultTextView = (TextView) rowView.findViewById(R.id.mathin20_check_result_show);
+
+
+            final MathTest testItem = (MathTest) values.get(position);
+            operand1TextView.setText(testItem.operand1 + "");
+            operand2TextView.setText(testItem.operand2 + "");
+            operatorTextView.setText(testItem.operator);
+            inputEditText.setText(testItem.inputResult);
+            if (checkResultShow) {
+                if(String.valueOf(testItem.expectResult).equals(testItem.inputResult)){
+                    checkResultTextView.setText("+10");
+                    checkResultTextView.setTextColor(Color.GREEN);
+                }else{
+                    checkResultTextView.setText("-10");
+                    checkResultTextView.setTextColor(Color.RED);
+                }
+            } else {
+                checkResultTextView.setText("");
+            }
+
+            return rowView;
+        }
+    }
+
     public static class MathIn20Fragment extends Fragment {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_mathin20, container, false);
+            final int TOTAL_TEST_NUMBER = 5;
+            final int MAXMUIM = 20;
+
+
+            View rootView = inflater.inflate(R.layout.fragment_list_mathin20, container, false);
+
+            ListView listView = (ListView) rootView.findViewById(R.id.listView);
+            ArrayList<MathTest> list = MathTest.generateTests(TOTAL_TEST_NUMBER, MAXMUIM);
+            MathTestListAdapter adapter = new MathTestListAdapter(this.getContext(), list);
+            listView.setAdapter(adapter);
+
+            Button checkBtn = (Button)rootView.findViewById(R.id.mathin20_botton_check);
+            checkBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ListView listView = (ListView) view.getRootView().findViewById(R.id.listView);
+                        TextView showStatus = (TextView)view.getRootView().findViewById(R.id.mathin20_show_message);
+                        MathTestListAdapter adapter = (MathTestListAdapter)listView.getAdapter();
+                        int passNumber = 0;
+                        for(int i=0;i<adapter.getCount(); i++){
+                            EditText resultEditText =  (EditText)listView.getChildAt(i).findViewById(R.id.mathin20_input_result);
+                            MathTest test=(MathTest)adapter.getItem(i);
+                            String inputResult = resultEditText.getText().toString();
+                            test.setInputResult(inputResult);
+
+                            if(String.valueOf(test.expectResult).equals(inputResult)){
+                                passNumber++;
+                            }
+                        }
+                        adapter.setCheckResultShow(true);
+                        adapter.notifyDataSetChanged();
+                        showStatus.setText(String.format("Total Score:%d, Your score: %d", 100, 100 * passNumber / TOTAL_TEST_NUMBER));
+                    }
+                });
+
+            Button renewBtn = (Button)rootView.findViewById(R.id.mathin20_botton_renew);
+            renewBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ListView listView = (ListView) view.getRootView().findViewById(R.id.listView);
+                    TextView showStatus = (TextView)view.getRootView().findViewById(R.id.mathin20_show_message);
+
+                    ArrayList<MathTest> list = MathTest.generateTests(TOTAL_TEST_NUMBER, MAXMUIM);
+                    MathTestListAdapter adapter = new MathTestListAdapter(view.getContext(), list);
+                    listView.setAdapter(adapter);
+
+                    adapter.setCheckResultShow(false);
+                    adapter.notifyDataSetChanged();
+                    showStatus.setText("");
+                }
+            });
             return rootView;
+
         }
     }
 
@@ -289,7 +441,7 @@ public class Main2Activity extends AppCompatActivity {
         private final ArrayList values;
 
         public PackageListAdapter(Context context, ArrayList values) {
-            super(context, R.layout.fragment_package_list_row, values);
+            super(context, R.layout.fragment_list_row_packages, values);
             this.context = context;
             this.values = values;
         }
@@ -298,7 +450,7 @@ public class Main2Activity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.fragment_package_list_row, parent, false);
+            View rowView = inflater.inflate(R.layout.fragment_list_row_packages, parent, false);
             TextView appNameTextView = (TextView) rowView.findViewById(R.id.appName);
             TextView packageNameTextView = (TextView) rowView.findViewById(R.id.packageName);
             TextView isSystemTextView = (TextView) rowView.findViewById(R.id.isSystemPackage);
@@ -306,7 +458,7 @@ public class Main2Activity extends AppCompatActivity {
 
             Button enableDisableBtn = (Button) rowView.findViewById(R.id.enabled_disable_btn);
 
-                    final LocalPackageInfo packInfo = (LocalPackageInfo)values.get(position);
+            final LocalPackageInfo packInfo = (LocalPackageInfo)values.get(position);
 
             appNameTextView.setText(packInfo.appName);
             packageNameTextView.setText(packInfo.packageName);
@@ -344,7 +496,7 @@ public class Main2Activity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_package_list, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_list, container, false);
             ListView listView = (ListView) rootView.findViewById(R.id.listView);
 
             ArrayList<LocalPackageInfo> packages = new ArrayList<LocalPackageInfo>();
@@ -430,40 +582,7 @@ public class Main2Activity extends AppCompatActivity {
                     return true;
                 }
             });
-        }else{
-            Log.e("LIUYQ", "Show message component not found");
-        }
-    }
-
-    public void additionIn20(View view) {
-        TextView textView = (TextView) findViewById(R.id.show_message_mathin20);
-        int scope = 10;
-        if(textView != null) {
-            //boolean isAddition = r.nextBoolean();
-            boolean isAddition = true;
-            int operand1 = r.nextInt(scope);
-            String output = "";
-            int result = 0;
-            if (isAddition) {
-                int operand2 = r.nextInt(scope);
-                output = operand1 + " + " + operand2 + " = ";
-                result = operand1 + operand2;
-            } else {
-                int operand2 = operand1 == 0 ? 0 : r.nextInt(operand1);
-                output = operand1 + " - " + operand2 + " = ";
-                result = operand1 - operand2;
-            }
-            textView.setText(output + "?");
-            textView.setHint(result + "");
-            final String finalOutput = output;
-            final int finalResult = result;
-            textView.setOnLongClickListener(new View.OnLongClickListener() {
-                public boolean onLongClick(View v) {
-                    Toast.makeText(v.getContext(), finalOutput + finalResult, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            });
-        }else{
+        }else {
             Log.e("LIUYQ", "Show message component not found");
         }
     }
